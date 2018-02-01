@@ -1,0 +1,22 @@
+export default {
+	maintenanceMenu: 'Maintenance Menu',
+	addATaskTrigger: 'Add a Task Trigger',
+	addAProjectTrigger: 'Add a Project Trigger',
+	taskTriggers: 'Task Triggers',
+	projectTriggers: 'Project Triggers',
+	triggerDetails: 'Trigger Details',
+	enabled: 'Enabled',
+	logErrorsForSysAdmin: 'Log Errors for SysAdmin',
+	workflow: 'Workflow',
+	name: 'Name',
+	filterDotDot: 'Filter...',
+	confirmDeleteEntry: 'Are you sure you want to delete the entry?',
+	watchedFields: 'Watched Fields',
+	triggerCriteria: 'Trigger Criteria',
+	triggerCommands: 'Trigger Commands',
+	save: 'Save',
+	copy: 'Copy',
+	reset: 'Reset',
+	notANumber: 'Not a number',
+	notADate: 'Not a date'
+};

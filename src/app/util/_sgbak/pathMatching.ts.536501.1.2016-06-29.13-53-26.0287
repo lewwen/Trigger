@@ -1,0 +1,41 @@
+import { Seq } from 'immutable';
+import { ContainerTypes, MetaNode, MetaType } from '../../app/types';
+import { MetaContext, getDirectChildren } from '../../app/MetaContext';
+import MetaQueryable from '../../app/util/MetaQueryable';
+
+interface TypeInfoNode {
+    typeMeta: number;
+    nodes: number[];
+    linkedTypes: number[];
+}
+
+export var getMetaForType = (context: MetaContext, node: MetaNode): MetaNode => {
+    if (node.containerType === ContainerTypes.VALUE) {
+        var metaKey = context.typing.filter(t => t.type.equals(node.type)).first().meta;
+        
+        if (metaKey != null) {
+            node = context.nodes.get(metaKey);
+        }
+    }
+    
+    return node;
+}
+
+var getChildrenExtended = (context: MetaContext, node: MetaNode): MetaNode[] => {
+    return getDirectChildren(context.nodes, getMetaForType(context, node));
+}
+
+export var getSiblingsForType = (context: MetaContext, filter: MetaType, parent: MetaNode): MetaNode[] => {
+    var filterInfo = context.typing.filter(t => t.type.equals(filter)).first();   
+    if (filterInfo.distanceForLinkedNodes.get(parent.key) == null) {
+        return [];
+    }
+    
+    var allChildren = Seq(getChildrenExtended(context, parent));
+    
+    return allChildren.
+        map(n => ({ node: n, distance: filterInfo.distanceForLinkedNodes.get(n.key)})).
+        filter(n => n.distance != null).
+        sortBy(n => n.distance).
+        map(n => n.node).toArray();
+}

@@ -1,0 +1,118 @@
+import { Seq, Map } from 'immutable';
+import * as React from 'react';
+import { bindActionCreators } from 'redux';
+import { Container, ContainerTypes, MetaNode } from '../types';
+import { MetaContext, CommonTypes } from '../MetaContext';
+import { allActions as CommandActions } from '../actions/CommandActions';
+import { isCollection } from '../util/MetaHelper';
+
+import Command from './Command';
+import CommandValue from './CommandValue';
+import CommandCollection from './CommandCollection';
+import ContainerCollection from './ContainerCollection';
+
+import MetaQueryable from '../util/MetaQueryable';
+import ContainerQueryable from '../util/ContainerQueryable';
+import { getChildren, getFirstChild } from '../util/Containers'
+
+let ParameterInput = ({ container = null as Container, containers = null as Map<number, Container>, context = null as MetaContext, actions = null }) => {
+    const nextContainers = getChildren(containers, container);
+
+    var nextControl = getNextControl(container, containers, context, actions, nextContainers);
+    return buildControl(context, containers, container, actions, nextContainers.length !== 0, nextControl);
+}
+
+function buildControl(context: MetaContext, containers: Map<number, Container>, container: Container, actions: any, hasChildren: boolean, nextControl: any) {
+    const shouldHideInput = container.siblingMeta.length === 0 || (container.siblingMeta.length === 1 && hasChildren);
+    var showDelete = container.parent == container.parameter && isCollection(context.nodes.get(containers.get(container.parameter).meta));
+    if (shouldHideInput) {
+        return <span>
+            {nextControl}
+            {showDelete ? <span className={`image-delete`} onClick={() => actions.deleteContainer(container.key)} /> : null}
+        </span>
+        ;
+    }
+
+    var childOptions = Seq(container.siblingMeta).map(x => context.nodes.get(x)).toArray();
+    
+
+    return <span>
+        {displayOptions(context, container, childOptions, actions)}
+        {nextControl}
+        {showDelete ? <span className={`image-delete`} onClick={() => actions.deleteContainer(container.key)} /> : null}
+    </span>;
+}
+
+function displayOptions(context: MetaContext, container: Container, options: MetaNode[], actions) {
+    return <select onChange={(event) => actions.changeId(container.key, (event.target as HTMLSelectElement).value)} value={container.id}>
+        {options.map(x => <option key={x.key} value={x.id}>{x.text}</option>)}
+    </select>;
+}
+
+function getNextControl(container: Container, containers: Map<number, Container>, context: MetaContext, actions: any, nextContainers: Container[]): JSX.Element | JSX.Element[] {
+    if (context.loadingNodes.contains(container.meta)) {
+        return <span className="image-loading-small" />;
+    }
+    
+    var meta = context.nodes.get(container.meta);
+
+    switch (meta.containerType) {
+        case ContainerTypes.COMMAND:
+            let commandParams = new ContainerQueryable(containers, Seq.of(container)).children().withId('params').children().toArray();
+            if (container.id == 'gettasktemplate' || container.id == 'getprojecttemplate'){
+                let commandValues = new ContainerQueryable(containers, Seq.of(container)).children().withId('value').first();
+                let showDrillDrow =  containers.filter(x => x.parent == commandValues.key).count()==0;
+                 return <CommandValue key={container.key} containers={containers} context={context} container={container} 
+                 parameters={commandParams} actions={actions} valueContainer={commandValues} showDrillDrow ={showDrillDrow} />;
+            }
+           
+            return <Command key={container.key} containers={containers} context={context} container={container} parameters={commandParams} actions={actions} />;
+        case ContainerTypes.INPUT:
+            let input = getFirstChild(containers, container);
+            
+            if (input.id !== "lookup") {
+                let value = getFirstChild(containers, input);
+                let valueNextContainers = getChildren(containers, value);
+                var nextControl = <span>
+                    {getInputControl(context, input, value, actions)}
+                    {(value.errors || []).map(error => <span>{error}</span>)}
+                    {getChildParameterInput(value, containers, context, actions, valueNextContainers)}
+                </span>;
+                
+                return buildControl(context, containers, input, actions, true /*hasChildren*/, nextControl);
+            }
+    }
+
+    if (isCollection(meta)) {
+        if (meta.type.equals(CommonTypes.COMMAND)) {
+            return <CommandCollection containers={containers} context={context} containerKey={container.key} actions={actions} />
+        } else {
+            return <ContainerCollection containers={containers} context={context} container={container} actions={actions} />
+        }
+    }
+
+    return getChildParameterInput(container, containers, context, actions, nextContainers)
+}
+
+function getChildParameterInput(container: Container, containers: Map<number, Container>, context: MetaContext, actions: any, nextContainers: Container[]): JSX.Element | JSX.Element[] {
+       if (nextContainers.length === 0 && container.canDrillDown) {
+        return <a href="#" onClick={() => actions.extendContainer(container.key)}>
+            ..
+        </a>;
+    } else {
+        return nextContainers.map(param => <ParameterInput key={param.key} container={param} containers={containers} context={context} actions={actions} />);
+    }
+}
+
+function getInputControl(context: MetaContext, input: Container, value: Container, actions: any): any {
+    switch (input.id) {
+        case "text":
+        case "number":
+        case "date":
+            return <input type="text" onChange={event => actions.changeId(value.key, (event.target as HTMLInputElement).value)} value={value.id}/>;
+        case "boolean":
+            return <input type="checkbox" onChange={event => actions.changeId(value.key, (event.target as HTMLInputElement).checked ? 'true' : '')} checked={value.id == 'true'} />;
+    }
+}
+
+export default ParameterInput;

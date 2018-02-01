@@ -1,0 +1,129 @@
+/* latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 300;
+  src: url('../fonts/Raleway Light.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+/* latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/Raleway.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+/* latin */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 600;
+  src: url('../fonts/Raleway SemiBold.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+}
+
+.toolbox-command {
+  border: 1px solid black;
+  margin: 6px;
+  padding: 3px;
+  text-align: center;
+  background-color: #FFF;
+  border-radius: 6px;
+  display: block;
+}
+
+.group {
+  border: 1px solid black;
+  margin: 10px 0px;
+}
+
+.section-contents {
+    padding: 5px;
+}
+
+.section-topright {
+    float: right;
+    margin: 2px;
+}
+
+.group > h2 {
+    text-transform: uppercase;
+    text-decoration: underline;
+    letter-spacing: .2rem;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.commands {
+    border: 1px dashed #000;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.group > div > h3 {
+    text-align: center;
+    border-top: 1px solid #666;
+    border-bottom: 1px solid #666;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+button {
+    margin: 3px;
+}
+
+.image-close, .image-cog-back, .image-cog-add, .image-delete, .image-position-active, .image-position-inactive, .image-loading-small {
+    color: black;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-collapse: collapse;
+}
+
+.image-close:before {
+    content: "x";
+}
+
+.image-delete:before {
+    content: "☒";
+}
+
+.image-cog-back:before {
+    content: "<";
+}
+
+.image-cog-add:before {
+    content: "+";
+}
+
+.image-position-active:before {
+    content: "◉";
+}
+
+.image-position-inactive:before {
+    content: "◎";
+}
+
+.image-loading-small:before {
+    content: "*";
+    font-size: 1.5em;
+}
+
+.image-loading-small:after {
+    content: "*";
+}
+
+.image-loading-small {
+    animation-name: spin;
+    animation-duration: 400ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes spin {
+    from {transform:rotate(0deg);}
+    to {transform:rotate(360deg);}
+}

@@ -1,0 +1,43 @@
+import { List } from 'immutable';
+import { TriggerState } from '../TriggerState';
+import { SimpleContextNode } from '../util/convertContext';
+import { LOAD_NODES } from '../constants/ActionTypes';
+import { SagaIterator } from 'redux-saga';
+import { take, call, put, select } from 'redux-saga/effects';
+
+var loadedNodes = List<number>(); 
+
+export default function* containerLoader(): SagaIterator {
+    while (true) {
+        const action = yield take('*');
+        const state: TriggerState = yield select();
+        
+        for (var key of state.context.loadingNodes.toArray()) {
+            if (loadedNodes.contains(key)) {
+                continue;
+            }
+            
+            loadedNodes = loadedNodes.push(key);
+            var node = state.context.nodes.get(key);
+            
+            const children = yield call(fetchChildren, node.async.retrievalParams);
+            
+            yield put({ type: LOAD_NODES, key: key, nodes: children });
+        }
+    }
+}
+
+//var delay = (ms) => new Promise((resolve, reject) => setTimeout(resolve, ms));
+
+var fetchChildren = (retrievalParams: { [id: string]: any; }): Promise<SimpleContextNode[]> => {
+    return fetch('WorkflowAjaxService.asmx/GetContainerMeta', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        credentials: 'include',
+        body: `tagStore=${JSON.stringify(retrievalParams)}`
+    }).then(
+         response => response.json()
+    );
+}

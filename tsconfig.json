@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "jsx": "preserve",
+        "target": "es6",
+        "module": "commonjs",
+        "noImplicitAny": false,
+        "suppressImplicitAnyIndexErrors": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
+    },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "docs",
+        "css",
+        "fonts"
+    ],
+    "awesomeTypescriptLoaderOptions": {
+        "useBabel": true,
+        "useCache": true,
+        "forkChecker": true
+    }
+}

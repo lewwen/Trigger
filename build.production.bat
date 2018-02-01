@@ -1,0 +1,1 @@
+npm install --loglevel=error && node node_modules/webpack/bin/webpack.js --config webpack.production.config.js
